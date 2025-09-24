@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Heart } from "lucide-react";
 import { NAV_ITEMS, COUPLE_INFO } from "@/lib/constants";
 import { Button } from "@/components/ui/button";
@@ -59,7 +59,14 @@ export function Header() {
                   isScrolled ? "text-gray-600" : "text-white/80"
                 }`}
               >
-                12.10.2025 • Hải Phòng
+                {new Date(COUPLE_INFO.weddingDate)
+                  .toLocaleDateString("vi-VN", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                  .replace(/\//g, ".")}{" "}
+                • Hải Phòng
               </p>
             </div>
           </motion.div>
@@ -102,29 +109,31 @@ export function Header() {
         </div>
 
         {/* Mobile Navigation */}
-        {isMobileMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white/95 backdrop-blur-md rounded-lg mt-2 shadow-lg"
-          >
-            <nav className="px-4 py-4 space-y-2">
-              {NAV_ITEMS.map((item, index) => (
-                <motion.button
-                  key={item.href}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.1 }}
-                  onClick={() => scrollToSection(item.href)}
-                  className="block w-full text-left px-4 py-3 text-gray-700 hover:text-pink-500 hover:bg-pink-50 rounded-md transition-colors"
-                >
-                  {item.label}
-                </motion.button>
-              ))}
-            </nav>
-          </motion.div>
-        )}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden bg-white/95 backdrop-blur-md rounded-lg mt-2 shadow-lg"
+            >
+              <nav className="px-4 py-4 space-y-2">
+                {NAV_ITEMS.map((item, index) => (
+                  <motion.button
+                    key={item.href}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.1 }}
+                    onClick={() => scrollToSection(item.href)}
+                    className="block w-full text-left px-4 py-3 text-gray-700 hover:text-pink-500 hover:bg-pink-50 rounded-md transition-colors"
+                  >
+                    {item.label}
+                  </motion.button>
+                ))}
+              </nav>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </motion.header>
   );

@@ -118,22 +118,50 @@ export function Wishes() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div>
+                  <label
+                    htmlFor="wish-name"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Tên của bạn *
+                  </label>
                   <Input
+                    id="wish-name"
+                    aria-required="true"
+                    aria-invalid={!!errors.name}
+                    aria-describedby={
+                      errors.name ? "wish-name-error" : undefined
+                    }
+                    required
                     {...register("name", {
                       required: "Vui lòng nhập tên của bạn",
                     })}
-                    placeholder="Tên của bạn *"
+                    placeholder="Tên của bạn"
                     className={errors.name ? "border-red-300" : ""}
                   />
                   {errors.name && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p
+                      id="wish-name-error"
+                      className="text-red-500 text-sm mt-1"
+                    >
                       {errors.name.message}
                     </p>
                   )}
                 </div>
 
                 <div>
+                  <label
+                    htmlFor="wish-email"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Email (không bắt buộc)
+                  </label>
                   <Input
+                    id="wish-email"
+                    inputMode="email"
+                    aria-invalid={!!errors.email}
+                    aria-describedby={
+                      errors.email ? "wish-email-error" : undefined
+                    }
                     {...register("email", {
                       pattern: {
                         value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -141,17 +169,34 @@ export function Wishes() {
                       },
                     })}
                     type="email"
-                    placeholder="Email (không bắt buộc)"
+                    placeholder="you@example.com"
                   />
                   {errors.email && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p
+                      id="wish-email-error"
+                      className="text-red-500 text-sm mt-1"
+                    >
                       {errors.email.message}
                     </p>
                   )}
                 </div>
 
                 <div>
+                  <label
+                    htmlFor="wish-message"
+                    className="block text-sm font-medium text-gray-700 mb-1"
+                  >
+                    Lời chúc *
+                  </label>
                   <Textarea
+                    id="wish-message"
+                    aria-required="true"
+                    aria-invalid={!!errors.message}
+                    aria-describedby={
+                      errors.message ? "wish-message-error" : undefined
+                    }
+                    required
+                    minLength={10}
                     {...register("message", {
                       required: "Vui lòng nhập lời chúc",
                       minLength: {
@@ -159,12 +204,15 @@ export function Wishes() {
                         message: "Lời chúc phải có ít nhất 10 ký tự",
                       },
                     })}
-                    placeholder="Viết lời chúc của bạn... *"
+                    placeholder="Viết lời chúc của bạn..."
                     rows={4}
                     className={errors.message ? "border-red-300" : ""}
                   />
                   {errors.message && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p
+                      id="wish-message-error"
+                      className="text-red-500 text-sm mt-1"
+                    >
                       {errors.message.message}
                     </p>
                   )}
@@ -217,7 +265,7 @@ export function Wishes() {
                     key={wish.id}
                     variants={itemVariants}
                     whileHover={{ scale: 1.02 }}
-                    className="bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300"
+                    className="relative bg-white rounded-2xl shadow-lg p-6 hover:shadow-xl transition-all duration-300 overflow-hidden"
                   >
                     {/* Wish Header */}
                     <div className="flex items-start space-x-4 mb-4">

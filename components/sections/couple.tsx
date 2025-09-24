@@ -97,7 +97,7 @@ export function Couple() {
           {/* Heart Separator */}
           <motion.div
             variants={itemVariants}
-            className="flex justify-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:z-10"
+            className="flex justify-center lg:absolute lg:left-1/2 lg:transform lg:-translate-x-1/2 lg:z-20 pointer-events-none"
           >
             <div className="w-16 h-16 bg-gradient-to-r from-pink-400 to-rose-400 rounded-full flex items-center justify-center shadow-lg">
               <Heart className="w-8 h-8 text-white fill-current" />
@@ -161,7 +161,15 @@ export function Couple() {
             <p className="text-white text-lg font-medium">
               Ngày cưới của chúng mình
             </p>
-            <p className="text-white text-3xl font-bold mt-2">12.10.2025</p>
+            <p className="text-white text-3xl font-bold mt-2">
+              {new Date(COUPLE_INFO.weddingDate)
+                .toLocaleDateString("vi-VN", {
+                  day: "2-digit",
+                  month: "2-digit",
+                  year: "numeric",
+                })
+                .replace(/\//g, ".")}
+            </p>
           </div>
         </motion.div>
 

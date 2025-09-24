@@ -14,12 +14,15 @@ import {
 
 export function Events() {
   const handleDownloadIcal = (event: (typeof WEDDING_EVENTS)[0]) => {
+    const start = new Date(`${event.date}T${event.time}:00`);
+    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000); // +2h
     const icalContent = generateICalEvent({
       title: event.title,
-      start: `${event.date}T${event.time}:00`,
-      end: `${event.date}T${event.time}:00`, // TODO: Add end time to events
+      start,
+      end,
       location: event.address,
       description: event.description,
+      timezone: "Asia/Ho_Chi_Minh",
     });
     downloadICalFile(icalContent, `${event.id}-thaivan-wedding`);
   };
@@ -27,12 +30,12 @@ export function Events() {
   const handleViewMap = (event: (typeof WEDDING_EVENTS)[0]) => {
     if (event.lat && event.lng) {
       const mapUrl = `https://www.google.com/maps/search/?api=1&query=${event.lat},${event.lng}`;
-      window.open(mapUrl, "_blank");
+      window.open(mapUrl, "_blank", "noopener,noreferrer");
     } else {
       const searchUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
         event.address
       )}`;
-      window.open(searchUrl, "_blank");
+      window.open(searchUrl, "_blank", "noopener,noreferrer");
     }
   };
 

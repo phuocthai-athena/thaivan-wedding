@@ -60,6 +60,9 @@ export function Modal({
                 "relative w-full max-w-md rounded-lg bg-white p-6 shadow-xl",
                 className
               )}
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby={title ? "modal-title" : undefined}
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close Button */}
@@ -74,7 +77,10 @@ export function Modal({
               {/* Title */}
               {title && (
                 <div className="mb-4">
-                  <h2 className="text-lg font-semibold text-gray-900">
+                  <h2
+                    id="modal-title"
+                    className="text-lg font-semibold text-gray-900"
+                  >
                     {title}
                   </h2>
                 </div>

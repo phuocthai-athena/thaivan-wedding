@@ -9,15 +9,29 @@ export function cn(...inputs: ClassValue[]) {
 // Date formatting utilities
 export function formatDate(
   date: string | Date,
-  locale: string = "vi-VN"
+  locale: string = "vi-VN",
+  options?: Intl.DateTimeFormatOptions
 ): string {
-  const d = new Date(date);
+  let d: Date;
+  if (typeof date === "string") {
+    const m = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if (m) {
+      const [, y, mo, da] = m;
+      d = new Date(Number(y), Number(mo) - 1, Number(da)); // local-safe
+    } else {
+      d = new Date(date);
+    }
+  } else {
+    d = new Date(date);
+  }
   return d.toLocaleDateString(locale, {
     weekday: "long",
     year: "numeric",
     month: "long",
     day: "numeric",
-  });
+    // Optionally force VN time: timeZone: "Asia/Ho_Chi_Minh",
+    ...options,
+  } as Intl.DateTimeFormatOptions);
 }
 
 export function formatTime(time: string): string {
@@ -39,25 +53,41 @@ export function formatDateTime(date: string, time: string): string {
 // Calendar utilities
 export function generateICalEvent(event: {
   title: string;
-  start: string;
-  end: string;
+  start: string | Date;
+  end: string | Date;
   location?: string;
   description?: string;
+  timezone?: string; // e.g., "Asia/Ho_Chi_Minh"
 }): string {
-  const formatICalDate = (date: string) => {
+  const asDate = (d: string | Date) => (d instanceof Date ? d : new Date(d));
+  const fmtUTC = (d: Date) =>
+    d.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const fmtLocal = (d: Date) => {
+    const pad = (n: number) => String(n).padStart(2, "0");
     return (
-      new Date(date).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z"
+      d.getFullYear().toString() +
+      pad(d.getMonth() + 1) +
+      pad(d.getDate()) +
+      "T" +
+      pad(d.getHours()) +
+      pad(d.getMinutes()) +
+      pad(d.getSeconds())
     );
   };
+  const useTZID = !!event.timezone;
+  const dtstart = useTZID
+    ? fmtLocal(asDate(event.start))
+    : fmtUTC(asDate(event.start));
+  const dtend = useTZID
+    ? fmtLocal(asDate(event.end))
+    : fmtUTC(asDate(event.end));
 
   const escapeICalText = (text: string) => {
     return text.replace(/([\\,;])/g, "\\$1").replace(/\n/g, "\\n");
   };
 
   const uid = `${Date.now()}@thaivan-wedding.com`;
-  const dtstamp = formatICalDate(new Date().toISOString());
-  const dtstart = formatICalDate(event.start);
-  const dtend = formatICalDate(event.end);
+  const dtstamp = fmtUTC(new Date());
 
   return [
     "BEGIN:VCALENDAR",
@@ -66,8 +96,10 @@ export function generateICalEvent(event: {
     "BEGIN:VEVENT",
     `UID:${uid}`,
     `DTSTAMP:${dtstamp}`,
-    `DTSTART:${dtstart}`,
-    `DTEND:${dtend}`,
+    useTZID
+      ? `DTSTART;TZID=${event.timezone}:${dtstart}`
+      : `DTSTART:${dtstart}`,
+    useTZID ? `DTEND;TZID=${event.timezone}:${dtend}` : `DTEND:${dtend}`,
     `SUMMARY:${escapeICalText(event.title)}`,
     event.location ? `LOCATION:${escapeICalText(event.location)}` : "",
     event.description ? `DESCRIPTION:${escapeICalText(event.description)}` : "",
